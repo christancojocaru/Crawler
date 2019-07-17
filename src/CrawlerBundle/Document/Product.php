@@ -10,20 +10,17 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Product
 {
-    /**
-     * @MongoDB\Id
-     */
+    /** @MongoDB\Id */
     protected $id;
 
-    /**
-     * @MongoDB\Field(type="string")
-     */
+    /** @MongoDB\Field(type="string") */
     protected $name;
 
-    /**
-     * @MongoDB\Field(type="float")
-     */
+    /** @MongoDB\Field(type="float") */
     protected $price;
+
+    /** @MongoDB\Field(type="date") */
+    protected $date;
 
     /**
      * @return mixed
@@ -64,4 +61,18 @@ class Product
     {
         $this->price = $price;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate()
+    {
+        $this->date = date("Y-m-d H:i:s");
+    }
+
 }

@@ -8,15 +8,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends Controller
+class IndexController extends Controller
 {
     /**
-     * @Route("/", name="crawler_action")
+     * @Route("/", name="index_action")
      * @return Response
      */
-    public function crawlerAction()
+    public function indexAction()
     {
-        return $this->render("default.html.twig");
+        return $this->render("index.html.twig");
     }
 
 }

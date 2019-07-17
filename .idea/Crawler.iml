@@ -2,10 +2,9 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/AppBundle" isTestSource="false" packagePrefix="AppBundle\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" packagePrefix="Tests\" />
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/AppBundle" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/CrawlerBundle" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/CrawlerBundle" isTestSource="false" packagePrefix="CrawlerBundle\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/alcaeus/mongo-php-adapter" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/annotations" />

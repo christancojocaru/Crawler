@@ -1,4 +1,17 @@
 services:
-#    crawler.example:
-#        class: CrawlerBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  CrawlerBundle\:
+    resource: '../../../CrawlerBundle/*'
+    exclude: '../../../CrawlerBundle/[Document]'
+
+#  CrawlerBundle\Command\Crawler:
+#      tags:
+#        - { name: 'console.command', command: 'app:crawler'}
+#      calls:
+#        - method: setDocumentManager
+#          arguments:
+#            - '@doctrine_mongodb.odm.document_manager'
