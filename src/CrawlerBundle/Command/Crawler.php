@@ -4,17 +4,24 @@
 namespace CrawlerBundle\Command;
 
 
+use CrawlerBundle\Division\Category;
+use CrawlerBundle\Division\Department;
+use CrawlerBundle\Division\Segment;
+use CrawlerBundle\Division\SubCategory;
 use CrawlerBundle\Document\Product;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Goutte\Client;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class Crawler extends Command
 {
+    const TEXT = "You are an ASSHOLE";
     /** @var string  */
     protected static $defaultName = 'app:crawler';
     /** @var DocumentManager $documentManager */
@@ -22,71 +29,170 @@ class Crawler extends Command
 
     private $departmentsLink = [];
 
+    private $categoriesLink = [];
+
+    private $subCategoriesLink = [];
+
+    private $subSubCategoriesLink = [];
+
     private $noOfProducts = 0;
+
+    private $input = [];
 
 //    private $allProductsName = array();
 
+    private $division;
 
     const URL = 'https://altex.ro';
 
     protected function configure()
     {
-        $this->setDescription('Crawling');
-//            ->addArgument('division', InputArgument::REQUIRED, "The Division to crawl: '");
+        $this->setDescription('Crawling')
+            ->addOption(
+                'department',
+                'D',
+                InputOption::VALUE_REQUIRED,
+                "Specify which department to crawl.")
+            ->addOption(
+                'category',
+                'C',
+                InputOption::VALUE_REQUIRED,
+                "Specify which category to crawl."
+            )
+            ->addOption(
+                'subCategory',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                "Specify which subCategory to crawl."
+            )
+            ->addOption(
+                'segment',
+                'S',
+                InputOption::VALUE_OPTIONAL,
+                "Specify which segment to crawl."
+            )
+            ->addOption(
+                'subSegment',
+                's',
+                InputOption::VALUE_OPTIONAL,
+                "Specify which subSegment to crawl."
+            );
     }
 
-    public function __construct($name = null)
+    public function __construct()
     {
-        parent::__construct($name);
+        parent::__construct(/*static::$defaultName*/);
         $client = new Client();
         $crawler = $client->request('GET', self::URL);
         $this->extractDepartmentsLink($crawler);
     }
 
-    protected function execute(InputInterface $input,OutputInterface  $output)
+    protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("Time is: ".date("H:i:s"));
-        ExecutionTime::start();
-        foreach ($this->departmentsLink as $departmentLink) {
-            $departmentClient = new Client();
-            $departmentCrawler = $departmentClient->request('GET', self::URL.$departmentLink);
-            $categoriesLink = $this->extractCategoriesLink($departmentCrawler);
-            foreach ($categoriesLink as $categoryLink) {
-                $categoriesClient = new Client();
-                $categoriesCrawler = $categoriesClient->request('GET', $categoryLink);
-                $subCategoriesLink = $this->checkSubCategory($categoriesCrawler);
-                if ($subCategoriesLink) {
-                    foreach ($subCategoriesLink as $subCategoryLink) {
-                        $subCategoriesClient = new Client();
-                        $subCategoriesCrawler = $subCategoriesClient->request('GET', $subCategoryLink);
-                            $subSubCategoriesLink = $this->checkSubCategory($subCategoriesCrawler);
-                            if ($subSubCategoriesLink) {
-                                foreach ($subSubCategoriesLink as $subSubCategoryLink) {
-                                    $subSubCategoriesClient = new Client();
-                                    $subSubCategoriesCrawler = $subSubCategoriesClient->request('GET', $subSubCategoryLink);
-                                    if ($this->checkSubCategory($subSubCategoriesCrawler)) continue;
-                                    $this->something($this->extractProduct($subSubCategoriesCrawler));
-                                }
-                            } else {
-                                $this->something($this->extractProduct($subCategoriesCrawler));
-                            }
-                    }
-                } else {
-                    $this->something($this->extractProduct($categoriesCrawler));
-                }
-            }
+        parent::interact($input, $output);
+        $noOfDepartment = count($this->departmentsLink);
+        $department = $input->getOption('department');
+        if ($department > $noOfDepartment) {
+            $output->write(sprintf(
+                "\e[1;37;41mDepartment with number %s is incorrect. Please select a number between 1 and %s\e[0m\n",
+                $department,
+                $noOfDepartment
+            ));
+            $department = readline("Insert department: ");
+            if ($department > $noOfDepartment) {echo self::TEXT;die;}
+            $input->setOption("department", $department);
         }
-        $output->writeln(sprintf('Execution time was : %s seconds', ExecutionTime::elapsed()));
-        $output->writeln("Now is: ".date("H:i:s"));
-        $output->writeln(sprintf('Saved %s products into database', $this->noOfProducts));
+        $this->setInputs($input);
     }
 
-    
+    protected function execute(InputInterface $input,OutputInterface  $output)
+    {
+        $output->write("Now is: ".date("H:i:s"));
+        ExecutionTime::start();
+        $options = array_slice($input->getOptions(), 0, 5);
+        switch ($options){
+            case ( array_key_exists("segment", $options) && !is_null($options["segment"]) ):
+                try {
+                    $this->division = new Segment(self::URL, $this->departmentsLink[$this->input["department"]], $this->input["category"], $this->input["subCategory"], $this->input["segment"]);
+                }catch (Exception $exception) {
+                    $output->write("\e[0;30;41m" . $exception->getMessage() . "\e[0m\n");
+                    $segment = readline("Insert segment: ");
+                    if ($segment > $exception->getCode()) {echo self::TEXT;die;}
+                    $this->division = new Segment(self::URL, $this->departmentsLink[$this->input["department"]], $this->input["category"], $this->input["subCategory"], $segment);
+                }
+                break;
+            case ( array_key_exists("subCategory", $options) && !is_null($options["subCategory"]) ):
+                try {
+                    $this->division = new SubCategory(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"], $this->input["subCategory"]);
+                }catch (Exception $exception) {
+                    $output->write("\e[0;30;41m" . $exception->getMessage() . "\e[0m\n");
+                    $subCategory = readline("Insert subcategory: ");
+                    if ($subCategory > $exception->getCode()) {echo self::TEXT;die;}
+                    $this->division = new SubCategory(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"], $subCategory);
+                }
+                break;
+            case ( array_key_exists("category", $options) && !is_null($options["category"]) ):
+                try {
+                    $this->division = new Category(self::URL.$this->departmentsLink[$this->input["department"]], $this->input["category"]);
+                }catch (Exception $exception) {
+                    $output->write("\e[0;30;41m" . $exception->getMessage() . "\e[0m\n");
+                    $category = readline("Insert category: ");
+                    if ($category > $exception->getCode()) {echo self::TEXT;die;}
+                    $this->division = new Category(self::URL . $this->departmentsLink[$this->input["department"]], $category);
+                }
+                break;
+            case ( array_key_exists("department", $options) && !is_null($options["department"]) ):
+                $this->division = new Department(self::URL . $this->departmentsLink[$this->input["department"]]);
+                break;
+            default:
+                $output->write("Try again");
+                die;
+        }
 
+        var_dump($this->division->getDepartments());
+        $this->something($this->division->getDepartments());
+////        foreach ($this->departmentsLink as $departmentLink) {
+//            $departmentClient = new Client();
+//            $departmentCrawler = $departmentClient->request('GET', self::URL.$this->departmentsLink[$department]);
+//            $categoriesLink = $this->extractCategoriesLink($departmentCrawler);
+////            foreach ($categoriesLink as $categoryLink) {
+//                $categoriesClient = new Client();
+//                $categoriesCrawler = $categoriesClient->request('GET', $categoriesLink[$category]);
+//                $subCategoriesLink = $this->checkSubCategory($categoriesCrawler);
+//                var_dump($categoriesLink, $subCategoriesLink);die;
+//                if ($subCategoriesLink) {
+//                    foreach ($subCategoriesLink as $subCategoryLink) {
+//                        $subCategoriesClient = new Client();
+//                        $subCategoriesCrawler = $subCategoriesClient->request('GET', $subCategoryLink);
+//                        $subSubCategoriesLink = $this->checkSubCategory($subCategoriesCrawler);
+//                        if ($subSubCategoriesLink) {
+//                            foreach ($subSubCategoriesLink as $subSubCategoryLink) {
+//                                $subSubCategoriesClient = new Client();
+//                                $subSubCategoriesCrawler = $subSubCategoriesClient->request('GET', $subSubCategoryLink);
+//                                if ($this->checkSubCategory($subSubCategoriesCrawler)) continue;
+//                                $this->something($this->extractProduct($subSubCategoriesCrawler));
+//                            }
+//                        } else {
+//                            $this->something($this->extractProduct($subCategoriesCrawler));
+//                        }
+//                    }
+//                } else {
+//                    $this->something($this->extractProduct($categoriesCrawler));
+//                }
+////            }
+////        }
+        $output->write(sprintf('Execution time was : %s seconds', ExecutionTime::elapsed()));
+        $output->write("Now is: ".date("H:i:s"));
+        $output->write(sprintf('Saved %s products into database', $this->noOfProducts));
+    }
 
-
-
-
+    private function setInputs(InputInterface $input)
+    {
+        $this->input["department"] = $input->getOption('department') - 1;
+        $this->input["category"] = $input->getOption('category') - 1;
+        $this->input["subCategory"] = $input->getOption('subCategory') - 1;
+        $this->input["segment"] = $input->getOption('segment') - 1;
+    }
 
     private function something($products)
     {
