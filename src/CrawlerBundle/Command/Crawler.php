@@ -10,7 +10,9 @@ use CrawlerBundle\Division\Product as ProductDivision;
 use CrawlerBundle\Division\Segment;
 use CrawlerBundle\Division\SubCategory;
 use CrawlerBundle\Document\Product;
+use CrawlerBundle\DocumentRepository\ProductRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Goutte\Client;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
@@ -19,6 +21,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class Crawler extends Command
@@ -41,7 +44,7 @@ class Crawler extends Command
     /** @var Category $division*/
     private $division;
      /** @var array $allProductsName */
-    private $allProductsName = array();
+    private $allProductsName = array("start");
 
     protected function configure()
     {
@@ -79,6 +82,12 @@ class Crawler extends Command
 
     public function __construct()
     {
+        date_default_timezone_set('Europe/Kiev');
+        $script_tz = date_default_timezone_get();
+        if (strcmp($script_tz, ini_get('date.timezone'))){
+            throw new Exception('Script timezone differs from ini-set timezone.');
+        }
+
         parent::__construct();
         $client = new Client();
         $crawler = $client->request('GET', self::URL);
@@ -231,10 +240,45 @@ class Crawler extends Command
             $isDuplicate = array_search($product->getName(), $this->allProductsName);
             if (is_int($isDuplicate)) continue;
             $this->allProductsName[] = $product->getName();
-            $this->addToDatabases($product);
-            $this->documentManager->flush();
-            $this->noOfProducts++;
+
+            $existsInDatabase = $this->checkPrices($product);
+            if (!$existsInDatabase) {
+                $this->addToDatabases($product);
+                $this->documentManager->flush();
+                $this->noOfProducts++;
+            }
         }
+    }
+
+    /** @return boolean
+     * @param ProductDivision $product
+     */
+    private function checkPrices(ProductDivision $product)
+    {
+        /** @var Product $old */
+        $old = $this->documentManager->getRepository(Product::class)->findOneBy([
+            "name" => $product->getName()
+        ]);
+        if (!empty($old)) {
+            $oldPrice = $old->getPrice();
+            $newPrice = $product->getPrice();
+            if ($oldPrice > $newPrice) {
+                $diffPrice = $oldPrice - $newPrice;
+                $this->generatePromotion($diffPrice);
+            }
+            return True;
+        } else {
+            return False;
+        }
+
+//        /** @var \MongoDate $date */
+//        $date = $old[0]->getDate();
+//        var_dump(date("Y-m-d H:i:s e", $date->sec));die;
+    }
+
+    private function generatePromotion($diffPrice)
+    {
+        var_dump("Promotion with" . $diffPrice);
     }
 
     private function extractDepartmentsLink($crawler)
@@ -249,6 +293,14 @@ class Crawler extends Command
             });
     }
 
+    private function getDivision($exception)
+    {
+        $arr = explode("\\", $exception);
+        $last = end($arr);
+        $last = strtolower(explode(".", $last)[0]);
+        return $last;
+    }
+
     private function addToDatabases($product)
     {
         /** @var ProductDivision $product */
@@ -260,14 +312,6 @@ class Crawler extends Command
         if ($this->noOfProducts % 10 == 0) {
             $this->documentManager->flush();
         }
-    }
-
-    private function getDivision($exception)
-    {
-        $arr = explode("\\", $exception);
-        $last = end($arr);
-        $last = strtolower(explode(".", $last)[0]);
-        return $last;
     }
 
     /**
