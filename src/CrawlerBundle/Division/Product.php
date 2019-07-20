@@ -4,11 +4,13 @@
 namespace CrawlerBundle\Division;
 
 
-use CrawlerBundle\Division\Abstracts\Product as AbstractProduct;
-//use Symfony\Component\Config\Definition\Exception\Exception;
-
-class Product extends AbstractProduct
+class Product
 {
+    /** @var string */
+    private $name;
+    /** @var float */
+    private $price;
+    /** @var string */
     private $description;
 
     /**
@@ -36,5 +38,35 @@ class Product extends AbstractProduct
         $this->description = $description;
     }
 
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice($price)
+    {
+        $this->price = $price;
+    }
 }

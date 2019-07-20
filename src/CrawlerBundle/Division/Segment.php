@@ -50,7 +50,6 @@ class Segment extends SubCategory
             $products = $this->extractProducts($crawler);
             foreach ($products as $product) {
                 $this->products[] = $this->setProduct($product);
-                break;
             }
         }
     }

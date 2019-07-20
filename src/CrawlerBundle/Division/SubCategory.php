@@ -49,7 +49,6 @@ class SubCategory extends Category
             $products = $this->extractProducts($crawler);
             foreach ($products as $product) {
                 $this->products[] = $this->setProduct($product);
-                break;
             }
         }
     }

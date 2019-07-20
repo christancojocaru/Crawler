@@ -4,9 +4,12 @@
     <list default="true" id="ff83c871-1c59-4067-b43e-24ce863d9d05" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Command/Crawler.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Command/Crawler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Product.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Division/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Division/Product.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CrawlerBundle/Document/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/CrawlerBundle/Document/Product.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,58 +28,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Command/Crawler.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="433">
-              <caret line="178" column="49" lean-forward="true" selection-start-line="178" selection-start-column="49" selection-end-line="178" selection-end-column="49" />
+            <state relative-caret-position="688">
+              <caret line="214" column="86" selection-start-line="214" selection-start-column="86" selection-end-line="214" selection-end-column="86" />
               <folding>
                 <element signature="e#43#79#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Department.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-451">
-              <caret line="22" column="26" lean-forward="true" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
-              <folding>
-                <element signature="e#44#62#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="84" column="32" lean-forward="true" selection-start-line="84" selection-start-column="32" selection-end-line="84" selection-end-column="32" />
-              <folding>
-                <element signature="e#44#62#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="586">
-              <caret line="91" lean-forward="true" selection-start-line="91" selection-end-line="91" />
-              <folding>
-                <element signature="e#44#62#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="95" column="34" selection-start-line="95" selection-start-column="34" selection-end-line="95" selection-end-column="34" />
-              <folding>
-                <element signature="e#44#62#0#PHP" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -122,14 +77,14 @@
         <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/SubSegment.php" />
         <option value="$PROJECT_DIR$/app/config/parameters.yml" />
         <option value="$PROJECT_DIR$/app/config/parameters.yml.dist" />
+        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Division.php" />
+        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Department.php" />
+        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php" />
+        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php" />
+        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php" />
         <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Product.php" />
         <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Product.php" />
         <option value="$PROJECT_DIR$/src/CrawlerBundle/Document/Product.php" />
-        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Division.php" />
-        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Department.php" />
-        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php" />
-        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php" />
-        <option value="$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php" />
         <option value="$PROJECT_DIR$/src/CrawlerBundle/Command/Crawler.php" />
       </list>
     </option>
@@ -204,7 +159,7 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/mongodb" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="952" />
     <option name="y" value="-8" />
     <option name="width" value="976" />
@@ -252,22 +207,7 @@
               <item name="Crawler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="CrawlerBundle" type="462c0819:PsiDirectoryNode" />
-              <item name="Command" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Crawler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="CrawlerBundle" type="462c0819:PsiDirectoryNode" />
               <item name="Division" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Crawler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="CrawlerBundle" type="462c0819:PsiDirectoryNode" />
-              <item name="Division" type="462c0819:PsiDirectoryNode" />
-              <item name="Abstracts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Crawler" type="b2602c69:ProjectViewProjectNode" />
@@ -290,11 +230,6 @@
               <item name="CrawlerBundle" type="462c0819:PsiDirectoryNode" />
               <item name="Resources" type="462c0819:PsiDirectoryNode" />
               <item name="config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Crawler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="var" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -354,18 +289,18 @@
       <workItem from="1563441876697" duration="20054000" />
       <workItem from="1563523865126" duration="15507000" />
       <workItem from="1563611412277" duration="13089000" />
+      <workItem from="1563631938402" duration="93000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="75024000" />
+    <option name="totallyTimeSpent" value="80882000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="952" y="-8" width="976" height="1056" extended-state="0" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.26528385" />
+      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.13059701" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Database Changes" order="1" />
@@ -426,7 +361,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/composer.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
+        <state relative-caret-position="83">
           <caret line="7" column="50" selection-start-line="7" selection-start-column="50" selection-end-line="7" selection-end-column="50" />
         </state>
       </provider>
@@ -580,21 +515,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/symfony/symfony/src/Symfony/Component/Console/Command/Command.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2108">
-          <caret line="140" column="23" selection-start-line="140" selection-start-column="23" selection-end-line="140" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Division.php" />
-    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Document/Product.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vendor/symfony/symfony/src/Symfony/Component/Config/Definition/Exception/Exception.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -622,10 +543,10 @@
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Department.php">
+    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-451">
-          <caret line="22" column="26" lean-forward="true" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
+        <state relative-caret-position="374">
+          <caret line="52" selection-start-line="52" selection-end-line="52" />
           <folding>
             <element signature="e#44#62#0#PHP" expanded="true" />
           </folding>
@@ -634,8 +555,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/SubCategory.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="586">
-          <caret line="91" lean-forward="true" selection-start-line="91" selection-end-line="91" />
+        <state relative-caret-position="671">
+          <caret line="51" selection-start-line="51" selection-end-line="51" />
           <folding>
             <element signature="e#44#62#0#PHP" expanded="true" />
           </folding>
@@ -644,44 +565,67 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Segment.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="95" column="34" selection-start-line="95" selection-start-column="34" selection-end-line="95" selection-end-column="34" />
+        <state relative-caret-position="433">
+          <caret line="52" selection-start-line="52" selection-end-line="52" />
           <folding>
             <element signature="e#44#62#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Product.php">
+    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Abstracts/Product.php" />
+    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Document/Product.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+        <state relative-caret-position="187">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Product.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="37" lean-forward="true" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
+        <state relative-caret-position="1207">
+          <caret line="71" column="1" lean-forward="true" selection-start-line="71" selection-start-column="1" selection-end-line="71" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Category.php">
+    <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Division/Department.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="84" column="32" lean-forward="true" selection-start-line="84" selection-start-column="32" selection-end-line="84" selection-end-column="32" />
+        <state relative-caret-position="110">
+          <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
           <folding>
             <element signature="e#44#62#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/doctrine/doctrine-bundle/Command/Proxy/DelegateCommand.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1394">
+          <caret line="102" column="53" selection-start-line="102" selection-start-column="53" selection-end-line="102" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/symfony/symfony/src/Symfony/Component/Console/Command/Command.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1870">
+          <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/stubs/readline/readline.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="145" column="9" selection-start-line="145" selection-start-column="9" selection-end-line="145" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/CrawlerBundle/Command/Crawler.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="433">
-          <caret line="178" column="49" lean-forward="true" selection-start-line="178" selection-start-column="49" selection-end-line="178" selection-end-column="49" />
+        <state relative-caret-position="688">
+          <caret line="214" column="86" selection-start-line="214" selection-start-column="86" selection-end-line="214" selection-end-column="86" />
           <folding>
             <element signature="e#43#79#0#PHP" expanded="true" />
+            <element signature="e#10732#11146#0#PHP" />
           </folding>
         </state>
       </provider>

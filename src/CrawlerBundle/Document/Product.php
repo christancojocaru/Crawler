@@ -8,19 +8,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\Document
  */
-class Product extends \CrawlerBundle\Division\Abstracts\Product
+class Product
 {
     /** @MongoDB\Id */
-    protected $id;
+    private $id;
 
     /** @MongoDB\Field(type="string") */
-    protected $name;
+    private $name;
 
     /** @MongoDB\Field(type="float") */
-    protected $price;
+    private $price;
 
     /** @MongoDB\Field(type="date") */
-    protected $date;
+    private $date;
 
     /**
      * @return mixed
@@ -43,4 +43,35 @@ class Product extends \CrawlerBundle\Division\Abstracts\Product
         $this->date = date("Y-m-d H:i:s");
     }
 
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice($price)
+    {
+        $this->price = $price;
+    }
 }

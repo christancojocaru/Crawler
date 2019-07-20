@@ -14,6 +14,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Goutte\Client;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,29 +23,25 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class Crawler extends Command
 {
+    use LockableTrait;
+
+    const URL = 'https://altex.ro';
     const TEXT = "You are an ASSHOLE";
+
     /** @var string  */
     protected static $defaultName = 'app:crawler';
     /** @var DocumentManager $documentManager */
     private $documentManager;
-
+    /** @var array $departmentsLink */
     private $departmentsLink = [];
-
-    private $categoriesLink = [];
-
-    private $subCategoriesLink = [];
-
-    private $subSubCategoriesLink = [];
-
+    /** @var int $noOfProducts */
     private $noOfProducts = 0;
-
+    /** @var array $input */
     private $input = [];
-
-//    private $allProductsName = array();
-
+    /** @var Category $division*/
     private $division;
-
-    const URL = 'https://altex.ro';
+     /** @var array $allProductsName */
+    private $allProductsName = array();
 
     protected function configure()
     {
@@ -82,7 +79,7 @@ class Crawler extends Command
 
     public function __construct()
     {
-        parent::__construct(/*static::$defaultName*/);
+        parent::__construct();
         $client = new Client();
         $crawler = $client->request('GET', self::URL);
         $this->extractDepartmentsLink($crawler);
@@ -90,7 +87,12 @@ class Crawler extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->lock()) {
+            $output->writeln("The command is already running in another process.");
+            die;
+        }
         parent::initialize($input, $output);
+
         $this->input["department"] = $input->getOption('department') - 1;
         $this->input["category"] = $input->getOption('category') - 1;
         $this->input["subCategory"] = $input->getOption('subCategory') - 1;
@@ -100,7 +102,6 @@ class Crawler extends Command
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         parent::interact($input, $output);
-
         $noOfDepartment = count($this->departmentsLink);
         $department = $this->input["department"];
         if ($department > $noOfDepartment) {
@@ -170,15 +171,10 @@ class Crawler extends Command
 
     protected function execute(InputInterface $input,OutputInterface  $output)
     {
-        $output->write("Now is: ".date("H:i:s"));
+        $output->writeln("Now is: ".date("H:i:s"));
         ExecutionTime::start();
 
-//        $this->something($this->division->getDepartments());
-        declare(ticks = 1);
-
-        pcntl_signal(SIGTERM, [$this, 'doExit']);
-
-        while (true) {
+        if (is_null($this->division)){
             foreach ($this->departmentsLink as $departmentLink) {
                 $department = new Department(self::URL . $departmentLink);
                 $categoriesLink = $department->getLinks();
@@ -186,92 +182,60 @@ class Crawler extends Command
                     $category = new Category(self::URL . $departmentLink, $categoryNo);
                     $products = $category->getProducts();
                     if (empty($products)) {
-                        echo "EMPTY" . PHP_EOL;
                         $subCategoriesLink = $category->getLinks();
                         foreach ($subCategoriesLink as $subCategoryNo => $subCategoryLink) {
                             $subCategory = new SubCategory(self::URL . $departmentLink, $categoryNo, $subCategoryNo);
                             $subProducts = $subCategory->getProducts();
                             if (empty($subProducts)) {
-                                echo "SUB EMPTY" . PHP_EOL;
                                 $segmentsLink = $subCategory->getLinks();
                                 foreach ($segmentsLink as $segmentNo => $segmentLink) {
                                     $segment = new Segment(self::URL . $departmentLink, $categoryNo, $subCategoryNo, $segmentNo);
                                     $subSubProducts = $segment->getProducts();
                                     if (empty($subSubProducts)) continue;
-                                    /** @var ProductDivision $subSubProduct */
-                                    $subSubProduct = $subSubProducts[0];
-                                    echo $subSubProduct->getName();
+                                    $this->something($products);die;
                                 }
                             } else {
-                                /** @var ProductDivision $subProduct */
-                                $subProduct = $subProducts[0];
-                                echo $subProduct->getName();
-                                echo PHP_EOL;
+                                $this->something($products);break;
                             }
                         }
                     } else {
-                        /** @var ProductDivision $product */
-                        $product = $products[0];
-                        echo $product->getName();
-                        echo PHP_EOL;
+                        $response = readline("Do you want to save products to database :");
+                        if ($response == "y") {
+                            $this->something($products);break;
+                        }
                     }
+                }
+                break;
+            }
+        }else {
+            $products = $this->division->getProducts();
+            if (empty($products)) {
+                $output->writeln(sprintf("Sorry, Category %s from Department %s do not exists!", $this->input["category"], $this->input["department"]));
+            } else {
+                $response = readline("Do you want to save products to database[Yes][No] :");
+                if ($response == "y") {
+                    $this->something($products);
                 }
             }
         }
 
-
-//            $departmentClient = new Client();
-//            $departmentCrawler = $departmentClient->request('GET', self::URL.$this->departmentsLink[$department]);
-//            $categoriesLink = $this->extractCategoriesLink($departmentCrawler);
-////            foreach ($categoriesLink as $categoryLink) {
-//                $categoriesClient = new Client();
-//                $categoriesCrawler = $categoriesClient->request('GET', $categoriesLink[$category]);
-//                $subCategoriesLink = $this->checkSubCategory($categoriesCrawler);
-//                var_dump($categoriesLink, $subCategoriesLink);die;
-//                if ($subCategoriesLink) {
-//                    foreach ($subCategoriesLink as $subCategoryLink) {
-//                        $subCategoriesClient = new Client();
-//                        $subCategoriesCrawler = $subCategoriesClient->request('GET', $subCategoryLink);
-//                        $subSubCategoriesLink = $this->checkSubCategory($subCategoriesCrawler);
-//                        if ($subSubCategoriesLink) {
-//                            foreach ($subSubCategoriesLink as $subSubCategoryLink) {
-//                                $subSubCategoriesClient = new Client();
-//                                $subSubCategoriesCrawler = $subSubCategoriesClient->request('GET', $subSubCategoryLink);
-//                                if ($this->checkSubCategory($subSubCategoriesCrawler)) continue;
-//                                $this->something($this->extractProduct($subSubCategoriesCrawler));
-//                            }
-//                        } else {
-//                            $this->something($this->extractProduct($subCategoriesCrawler));
-//                        }
-//                    }
-//                } else {
-//                    $this->something($this->extractProduct($categoriesCrawler));
-//                }
-////            }
-////        }
-        $output->write(sprintf('Execution time was : %s seconds', ExecutionTime::elapsed()));
-        $output->write("Now is: ".date("H:i:s"));
-        $output->write(sprintf('Saved %s products into database', $this->noOfProducts));
-    }
-
-    /**
-     * Ctrl-Z
-     */
-    private function doExit()
-    {
-        exit;
+        $output->writeln(sprintf('Execution time was : %s seconds', ExecutionTime::elapsed()));
+        $output->writeln("Now is: ".date("H:i:s"));
+        $output->writeln(sprintf('Saved %s products into database', $this->noOfProducts));
     }
 
     private function something($products)
     {
+        /** @var ProductDivision $product */
         foreach ($products as $product) {
-//            if (array_search($product[0], $this->allProductsName)) continue;
-//            $this->allProductsName[] = $product[0];
-//            $this->addToDatabases($product);
+            $isDuplicate = array_search($product->getName(), $this->allProductsName);
+            if (is_int($isDuplicate)) continue;
+            $this->allProductsName[] = $product->getName();
+            $this->addToDatabases($product);
+            $this->documentManager->flush();
             $this->noOfProducts++;
         }
     }
-
 
     private function extractDepartmentsLink($crawler)
     {
@@ -285,63 +249,17 @@ class Crawler extends Command
             });
     }
 
-    private function extractCategoriesLink($crawler)
-    {
-        return $crawler
-            ->filterXPath('//ul[contains(@class, "Products--5to2")]')//some pages have categories AND products on same page
-            ->filterXPath('//li[contains(@class, "Products-item")]')
-            ->each(function (DomCrawler $crawler) {
-                return $crawler
-                    ->filter('a')
-                    ->attr('href');
-            });
-    }
-
-    private function checkSubCategory($crawler)
-    {
-        $childrens = $crawler
-            ->filterXPath('//ul[contains(@class, "Products")]')
-            ->filterXPath('//li[contains(@class, "Products-item")]')
-            ->first()
-            ->children()
-            ->nodeName();
-        if ( $childrens == 'a' ) {
-            return $this->extractCategoriesLink($crawler);
-        }else{
-            return False;
-        }
-    }
-
-    private function extractProduct($crawler)
-    {
-        return $crawler
-            ->filterXPath('//ul[contains(@class, "Products--4to2")]')
-            ->filterXPath('//li[contains(@class, "Products-item")]')
-            ->each(function (DomCrawler $crawler) {
-                $price = $crawler
-                    ->filterXPath('//meta')
-                    ->reduce(function ($node, $i) {
-                        return ($i % 2) == 0;
-                    })
-                    ->extract(['content']);
-                $name = $crawler
-                    ->filterXPath('//h2')
-                    ->reduce(function ($node, $i) {
-                        return ($i % 2) == 0;
-                    })
-                    ->extract(['_text']);
-                return [$name[0], $price[0]];
-            });
-    }
-
     private function addToDatabases($product)
     {
+        /** @var ProductDivision $product */
         $newProduct = new Product();
-        $newProduct->setName($product[0]);
-        $newProduct->setPrice($product[1]);
+        $newProduct->setName($product->getName());
+        $newProduct->setPrice($product->getPrice());
         $newProduct->setDate();
         $this->documentManager->persist($newProduct);
-        $this->documentManager->flush();
+        if ($this->noOfProducts % 10 == 0) {
+            $this->documentManager->flush();
+        }
     }
 
     private function getDivision($exception)
