@@ -28,8 +28,7 @@ class SubCategory extends Category
             throw new Exception(
                 sprintf(
                     "SubCategory with number %s is incorrect. Please select a number between 1 and %s",
-                    $subCategoryNo + 1,
-                    $size
+                    $subCategoryNo + 1, $size
                 ),
                 $size
             );
@@ -42,16 +41,16 @@ class SubCategory extends Category
     {
         $client = new Client();
         $crawler = $client->request('GET', $this->url);
+        $this->subCategories = $this->extractNames($crawler);
         if ($this->checkSubCategory($crawler)) {
             $this->segments_link = $this->extractLinks($crawler);
-            $this->subCategories = $this->extractNames($crawler);
             $this->noOfSegments = count($this->segments_link);
         }else {
-            $products = $this->extractProduct($crawler);
+            $products = $this->extractProducts($crawler);
             foreach ($products as $product) {
                 $this->products[] = $this->setProduct($product);
+                break;
             }
-            var_dump($this->products);die;
         }
     }
 
@@ -89,5 +88,16 @@ class SubCategory extends Category
     public function getLinks()
     {
         return $this->segments_link;
+    }
+
+    public function getParentLinks()
+    {
+        return parent::getLinks();
+    }
+
+    /** @return array */
+    public function getProducts()
+    {
+        return $this->products;
     }
 }

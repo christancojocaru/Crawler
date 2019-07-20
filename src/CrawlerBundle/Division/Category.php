@@ -29,8 +29,7 @@ class Category extends Department
             throw new Exception(
                 sprintf(
                     "Category with number %s is incorrect. Please select a number between 1 and %s",
-                    $number + 1,
-                    $size
+                    $number + 1, $size
                 ),
                 $size
             );
@@ -43,23 +42,23 @@ class Category extends Department
     {
         $client = new Client();
         $crawler = $client->request('GET', $this->url);
+        $this->categories = $this->extractNames($crawler);
         if ($this->checkSubCategory($crawler)) {
             $this->sub_categories_link = $this->extractLinks($crawler);
-            $this->categories = $this->extractNames($crawler);
             $this->noOfSubCategories = count($this->sub_categories_link);
         }else {
-            $products = $this->extractProduct($crawler);
+            $products = $this->extractProducts($crawler);
             foreach ($products as $product) {
-                $this->products = $this->setProduct($product);
+                $this->products[] = $this->setProduct($product);
+                break;
             }
-            var_dump($this->products);die;
         }
     }
 
     protected function extractLinks($crawler)
     {
         return $crawler
-            ->filterXPath('//ul[contains(@class, "Products--5to2")]')//some pages have categories AND products on same page
+            ->filterXPath('//ul[contains(@class, "Products--5to2")]')
             ->filterXPath('//li[contains(@class, "Products-item")]')
             ->each(function (DomCrawler $crawler) {
                 return $crawler
@@ -71,12 +70,12 @@ class Category extends Department
     protected function extractNames($crawler)
     {
         return $crawler
-            ->filterXPath('//ul[contains(@class, "Products--5to2")]')//some pages have categories AND products on same page
+            ->filterXPath('//ul[contains(@class, "Products--5to2")]')
             ->filterXPath('//li[contains(@class, "Products-item")]')
             ->each(function (DomCrawler $crawler) {
                 return $crawler
                     ->filter('a > h2')
-                    ->extract(['_text'])[0];
+                    ->extract(['_text']);
             });
     }
 
@@ -89,7 +88,7 @@ class Category extends Department
         return $newProduct;
     }
 
-    protected function extractProduct($crawler)
+    protected function extractProducts($crawler)
     {
         return $crawler
             ->filterXPath('//ul[contains(@class, "Products--4to2")]')
@@ -156,9 +155,20 @@ class Category extends Department
         return $this->sub_categories_link[$number];
     }
 
+    public function getParentLinks()
+    {
+        return parent::getLinks();
+    }
+
     /** @return array */
     public function getLinks()
     {
         return $this->sub_categories_link;
+    }
+
+    /** @return array */
+    public function getProducts()
+    {
+        return $this->products;
     }
 }
