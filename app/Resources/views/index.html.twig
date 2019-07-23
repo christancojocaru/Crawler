@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h2>Merge</h2>
+    {% for product in products %}
+        <h2>Name:  {{ product["name"] }}</h2>
+        <h3>Old:   {{ product["oldPrice"] }}</h3>
+        <h3>New:   {{ product["newPrice"] }}</h3>
+        <h4>Promo:   {{ product["promoPrice"] }}</h4>
+        <h6>Discount:   {{ product["discount"]|number_format(2) }}%</h6>
+    {% endfor %}
 {% endblock %}

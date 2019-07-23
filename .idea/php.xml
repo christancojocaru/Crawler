@@ -61,6 +61,7 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/mongodb-odm-bundle" />
       <path value="$PROJECT_DIR$/vendor/doctrine/mongodb-odm" />
       <path value="$PROJECT_DIR$/vendor/doctrine/mongodb" />
+      <path value="$PROJECT_DIR$/vendor/php-amqplib/php-amqplib" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="5.5.0" />

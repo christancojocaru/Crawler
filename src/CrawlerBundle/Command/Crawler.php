@@ -14,6 +14,8 @@ use CrawlerBundle\DocumentRepository\ProductRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Goutte\Client;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
@@ -45,6 +47,8 @@ class Crawler extends Command
     private $division;
      /** @var array $allProductsName */
     private $allProductsName = array("start");
+    /** @var int $noOfPromotions */
+    private $noOfPromotions = 0;
 
     protected function configure()
     {
@@ -231,6 +235,9 @@ class Crawler extends Command
         $output->writeln(sprintf('Execution time was : %s seconds', ExecutionTime::elapsed()));
         $output->writeln("Now is: ".date("H:i:s"));
         $output->writeln(sprintf('Saved %s products into database', $this->noOfProducts));
+        if ($this->noOfPromotions > 0) {
+            $output->writeln(sprintf('Created %s promotion(s) into database', $this->noOfPromotions));
+        }
     }
 
     private function something($products)
@@ -263,8 +270,7 @@ class Crawler extends Command
             $oldPrice = $old->getPrice();
             $newPrice = $product->getPrice();
             if ($oldPrice > $newPrice) {
-                $diffPrice = $oldPrice - $newPrice;
-                $this->generatePromotion($diffPrice);
+                $this->generatePromotion($product->getName(), $oldPrice, $newPrice);
             }
             return True;
         } else {
@@ -276,9 +282,45 @@ class Crawler extends Command
 //        var_dump(date("Y-m-d H:i:s e", $date->sec));die;
     }
 
-    private function generatePromotion($diffPrice)
+    private function generatePromotion($name, $oldPrice, $newPrice)
     {
-        var_dump("Promotion with" . $diffPrice);
+        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+
+        $channel->queue_declare('promo', false, false, false, false);
+
+        $data = [
+            'name' => $name,
+            'oldPrice' => $oldPrice,
+            "newPrice" => $newPrice
+        ];
+
+        $msg = new AMQPMessage(json_encode($data));
+        $channel->basic_publish($msg, '', 'promo');
+
+        echo " [x] Sent product name: " . $data['name'] . "\n";
+
+        $channel->close();
+        $connection->close();
+
+
+//        $client = new \GuzzleHttp\Client([
+//            'base_uri' => 'http://crawler:80',
+//            'defaults' => [
+//                'exceptions' => false,
+//            ]
+//        ]);
+//
+//        $data = [
+//            'name' => $name,
+//            'oldPrice' => $oldPrice,
+//            "newPrice" => $newPrice
+//        ];
+//
+//        $response = $client->post('/api/promotion', [
+//            "body" => json_encode($data)
+//        ]);
+        $this->noOfPromotions++;
     }
 
     private function extractDepartmentsLink($crawler)
@@ -306,7 +348,7 @@ class Crawler extends Command
         /** @var ProductDivision $product */
         $newProduct = new Product();
         $newProduct->setName($product->getName());
-        $newProduct->setPrice($product->getPrice());
+        $newProduct->setPrice($product->getPrice() + rand(10, 100) );
         $newProduct->setDate();
         $this->documentManager->persist($newProduct);
         if ($this->noOfProducts % 10 == 0) {
