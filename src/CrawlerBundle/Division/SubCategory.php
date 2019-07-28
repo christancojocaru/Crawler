@@ -29,9 +29,7 @@ class SubCategory extends Category
                 sprintf(
                     "SubCategory with number %s is incorrect. Please select a number between 1 and %s",
                     $subCategoryNo + 1, $size
-                ),
-                $size
-            );
+                ));
         }
         $this->url = parent::getLink($subCategoryNo);
         $this->setSubCategory();

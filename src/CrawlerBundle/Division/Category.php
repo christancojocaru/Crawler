@@ -30,9 +30,7 @@ class Category extends Department
                 sprintf(
                     "Category with number %s is incorrect. Please select a number between 1 and %s",
                     $number + 1, $size
-                ),
-                $size
-            );
+                ));
         }
         $this->url = parent::getLink($number);
         $this->setCategory();

@@ -7,10 +7,18 @@ namespace AppBundle\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="promotion")
+ * @ORM\Table(
+ *     name="promotion",
+ *     uniqueConstraints={@ORM\UniqueConstraint(columns={"name", "product_id"})}
+ *      )
+ * @UniqueEntity(
+ *     fields={"name", "product"},
+ *     message="Promotion {{ value }} is already created for product {{ value }}"
+ * )
  */
 class Promotion
 {
@@ -44,8 +52,8 @@ class Promotion
      * @ORM\JoinColumn(
      *     name="product_id",
      *     referencedColumnName="id",
-     *     nullable=true,
-     * )
+     *     nullable=false,
+     *     )
      */
     private $product;
 

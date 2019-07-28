@@ -29,9 +29,7 @@ class Segment extends SubCategory
                 sprintf(
                     "Segment with number %s is incorrect. Please select a number between 1 and %s",
                     $segmentNo + 1, $size
-                ),
-                $size
-                );
+                ));
         }
         $this->url = parent::getLink($segmentNo);
         $this->setSegment();

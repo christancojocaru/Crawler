@@ -28,7 +28,7 @@ class Index extends Controller
             /** @var Promotion $promo */
             $promo = $em->getRepository(Promotion::class)->findOneBy(["product" => $product->getId()]);
             if (is_null($promo)) continue;
-            $discount = number_format($promo->getPercent(), 2);
+            $discount = number_format($promo->getPercent(), 4);
             $promoPrice = $product->getPrice() * $promo->getPercent();
             $newPrice = $product->getPrice() - $promoPrice;
             $data[$product->getId()] = [
