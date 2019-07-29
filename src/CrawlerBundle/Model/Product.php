@@ -1,7 +1,7 @@
 <?php
 
 
-namespace CrawlerBundle\Division;
+namespace CrawlerBundle\Model;
 
 
 class Product

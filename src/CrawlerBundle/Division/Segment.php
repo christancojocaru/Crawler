@@ -4,26 +4,16 @@
 namespace CrawlerBundle\Division;
 
 
-use Goutte\Client;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
-class Segment extends SubCategory
+class Segment extends WebPage
 {
-    /** @var string */
-    private $url;
-    /** @var array */
-    private $segments;
-    /** @var array */
-    private $sub_segments_link;
-    /** @var integer */
-    private $noOfSubSegments;
-    /** @var array */
-    private $products = [];
-
     public function __construct($url, $categoryNo, $subCategoryNo, $segmentNo)
     {
-        parent::__construct($url, $categoryNo, $subCategoryNo);
-        $size = parent::getSize();
+        $subCategory = new SubCategory($url, $categoryNo, $subCategoryNo);
+        $subUrl = $subCategory->getSubDivisionLink($subCategoryNo);
+        parent::__construct($subUrl);
+        $size = $subCategory->getSize();
         if ( $segmentNo > $size ) {
             throw new Exception(
                 sprintf(
@@ -31,71 +21,11 @@ class Segment extends SubCategory
                     $segmentNo + 1, $size
                 ));
         }
-        $this->url = parent::getLink($segmentNo);
-        $this->setSegment();
-
-    }
-
-    public function setSegment()
-    {
-        $client = new Client();
-        $crawler = $client->request('GET', $this->url);
-        $this->segments = $this->extractNames($crawler);
-        if ($this->checkSubCategory($crawler)) {
-            $this->sub_segments_link = $this->extractLinks($crawler);
-            $this->noOfSubSegments = count($this->sub_segments_link);
-        }else {
-            $products = $this->extractProducts($crawler);
-            foreach ($products as $product) {
-                $this->products[] = $this->setProduct($product);
-            }
+        if ($this->checkSubCategory()) {
+            $this->setSubDivisionsNameAndLink();
+            $this->noOfSubDivisions = count($this->sub_divisions_link);
+        } else {
+            $this->extractProducts();
         }
-    }
-
-    /** @return integer */
-    protected function getSize()
-    {
-        return $this->noOfSubSegments;
-    }
-
-    /**
-     * @return string
-     * @param $number
-     */
-    public function getSegment($number)
-    {
-        return $this->segments[$number];
-    }
-
-    /** @return array */
-    public function getSegments()
-    {
-        return $this->segments;
-    }
-
-    /**
-     * @return string
-     *@param $number
-     */
-    public function getLink($number)
-    {
-        return $this->sub_segments_link[$number];
-    }
-
-    /** @return array */
-    public function getLinks()
-    {
-        return $this->sub_segments_link;
-    }
-
-    public function getParentLinks()
-    {
-        return parent::getLinks();
-    }
-
-    /** @return array */
-    public function getProducts()
-    {
-        return $this->products;
     }
 }
