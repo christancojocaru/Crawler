@@ -43,4 +43,9 @@ trait DivisionTrait
     {
         return $this->products;
     }
+
+    public function getSubDivision($number)
+    {
+        return $this->sub_divisions[$number];
+    }
 }

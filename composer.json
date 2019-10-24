@@ -40,6 +40,8 @@
         "php-amqplib/rabbitmq-bundle": "~1.6"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.0",
+        "nelmio/alice": "^2.3",
         "sensio/generator-bundle": "^3.0",
         "symfony/phpunit-bridge": "^3.0"
     },

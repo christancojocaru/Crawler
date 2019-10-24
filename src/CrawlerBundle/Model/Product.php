@@ -11,7 +11,11 @@ class Product
     /** @var float */
     private $price;
     /** @var string */
+    private $image;
+    /** @var string */
     private $description;
+    /** @var integer */
+    private $category;
 
     /**
      * @param string $data
@@ -68,5 +72,37 @@ class Product
     public function setPrice($price)
     {
         $this->price = $price;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param int $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
     }
 }

@@ -36,14 +36,25 @@ class WebPage
 
     public function extractDepartmentsLink()
     {
-        return $this->crawler
+        $datas = $this->crawler
             ->filterXPath('//ul[contains(@class, "ProductsMenu")]')
             ->filterXPath('//li[contains(@class, "ProductsMenu-item")]')
             ->each(function (Crawler $crawler) {
                 return $crawler
                     ->filter('a')
-                    ->attr('href');
+                    ->extract(['href', '_text'])[0];//make nested arrays otherwise
             });
+        $response = [];
+        foreach ($datas as $data) {
+            $this->setDepartmentsName($data[1]);
+            $response[] = $data[0];
+        }
+        return $response;
+    }
+
+    private function setDepartmentsName($name)
+    {
+        $this->sub_divisions[] = $name;
     }
 
     protected function setSubDivisionsNameAndLink()
@@ -84,7 +95,11 @@ class WebPage
                         return ($i % 2) == 0;
                     })
                     ->extract(['_text']);
-                return [$name[0], $price[0]];
+                $image = $crawler
+                    ->filter("img")
+                    ->extract(["src"]);
+                //all variable are array, that's why [0]
+                return [$name[0], $price[0], $image[0]];
             });
         foreach ($products as $product) {
             $this->setProduct($product);
@@ -111,6 +126,7 @@ class WebPage
         $newProduct = new Product();
         $newProduct->setData($product[0]);
         $newProduct->setPrice(floatval($product[1]));
+        $newProduct->setImage($product[2]);
         $this->products[] = $newProduct;
     }
 }

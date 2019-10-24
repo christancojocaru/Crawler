@@ -15,6 +15,7 @@ use CrawlerBundle\Division\Segment;
 use CrawlerBundle\Division\SubCategory;
 use CrawlerBundle\Division\WebPage;
 
+use CrawlerBundle\Model\Product;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -109,7 +110,7 @@ class Crawler extends Command
         }
 
         parent::__construct();
-        $webPage = new WebPage(self::URL . "/home");
+        $webPage = new WebPage(self::URL);
         $this->departmentsLink = $webPage->extractDepartmentsLink();
 
     }
@@ -145,18 +146,20 @@ class Crawler extends Command
         }
 
         switch ($this->input){
-            case ( $this->input["segment"] > -1 ):
+            case ($this->input["segment"] > -1):
                 try {
                     $this->division = new Segment(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"], $this->input["subCategory"], $this->input["segment"]);
                 }catch (Exception $exception) {
                     $output->write("\e[1;37;41m" . $exception->getMessage() . "\e[0m\n");
+                    exit;
                 }
                 break;
-            case ( $this->input["subCategory"] > -1 ):
+            case ( $this->input["subCategory"] > -1):
                 try {
                     $this->division = new SubCategory(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"], $this->input["subCategory"]);
                 }catch (Exception $exception) {
                     $output->write("\e[1;37;41m" . $exception->getMessage() . "\e[0m\n");
+                    exit;
                 }
                 break;
             case ( $this->input["category"] > -1 ):
@@ -164,11 +167,11 @@ class Crawler extends Command
                     $this->division = new Category(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"]);
                 }catch (Exception $exception) {
                     $output->write("\e[1;37;41m" . $exception->getMessage() . "\e[0m\n");
-                    $category = readline("Insert category: ");
+                    $category_inserted = readline("Insert category number: ");
                     $noOf = $this->getNoOf($exception->getMessage());
-                    if ($category > $noOf) {echo self::TEXT;die;}
-                    $this->division = new Category(self::URL . $this->departmentsLink[$this->input["department"]], $category);
-                    $this->input["category"] = $category - 1;
+                    if ($category_inserted > $noOf) {echo self::TEXT;die;}
+                    $this->input["category"] = $category_inserted - 1;
+                    $this->division = new Category(self::URL . $this->departmentsLink[$this->input["department"]], $this->input["category"]);
                 }
                 break;
             case ( $this->input["department"] > -1 ):
@@ -210,19 +213,24 @@ class Crawler extends Command
                 }
             }
         } else if (is_null($this->division)){
+
             foreach ($this->departmentsLink as $departmentNo => $departmentLink) {
                 $department = new Department(self::URL . $departmentLink);
                 $categoriesLink = $department->getSubDivisionsLink();
+
                 foreach ($categoriesLink as $categoryNo => $categoryLink) {
                     $category = new Category(self::URL . $departmentLink, $categoryNo);
+                    /** @var ProductModel $products */
                     $products = $category->getProducts();
                     if (empty($products)) {
                         $subCategoriesLink = $category->getSubDivisionsLink();
+
                         foreach ($subCategoriesLink as $subCategoryNo => $subCategoryLink) {
                             $subCategory = new SubCategory(self::URL . $departmentLink, $categoryNo, $subCategoryNo);
                             $products = $subCategory->getProducts();
                             if (empty($products)) {
                                 $segmentsLink = $subCategory->getSubDivisionsLink();
+
                                 foreach ($segmentsLink as $segmentNo => $segmentLink) {
                                     $segment = new Segment(self::URL . $departmentLink, $categoryNo, $subCategoryNo, $segmentNo);
                                     $products = $segment->getProducts();
@@ -244,7 +252,7 @@ class Crawler extends Command
             if (empty($products)) {
                 $output->writeln(sprintf("Sorry, Category %s from Department %s does not exist!", $this->input["category"] + 1, $this->input["department"] + 1));
             } else {
-                $this->something($products);
+                $this->something($products, $this->input["department"], $this->input["category"], $this->input["subCategory"], $this->input["segment"]);
             }
         }
 
@@ -272,15 +280,19 @@ class Crawler extends Command
         }
         /** @var ProductModel $product */
         foreach ($products as $product) {
+            if (!is_null($category)) {
+                $product->setCategory($category + 1);
+            }
+            $name = $product->getName();
             //need improvement like differentiate product by specs, price...
-            $isDuplicate = array_search($product->getName(), $this->allProductsName);
+            $isDuplicate = array_search($name, $this->allProductsName);
             if (is_int($isDuplicate)) {
-                var_dump($product);
+//                var_dump($product);
                 continue;
             };
-            $this->allProductsName[] = $product->getName();
+            $this->allProductsName[] = $name;
 
-            $existsInDatabase = $this->checkPrices($product);
+            $existsInDatabase = $this->checkPriceInDatabase($product);
             if (!$existsInDatabase && $this->saveEntityResponse === 'yes') {
                 $this->createEntity($product);
                 $this->noOfEntitiesSaved++;
@@ -298,24 +310,35 @@ class Crawler extends Command
      * @param ProductModel $product
      * @return boolean
      */
-    private function checkPrices(ProductModel $product)
+    private function checkPriceInDatabase(ProductModel $product)
     {
         $old = $this->dm->getRepository(ProductDocument::class)->findOneBy(["name" => $product->getName()]);
 
         if (!empty($old)) {
             $oldPrice = $old->getPrice();
             $newPrice = $product->getPrice();
-            if ($this->makePromotionResponse === "no") {
-                $this->makePromotionResponse = readline("Do you want to generate promotions[Yes][No]: ");
-            }
-            if ($oldPrice > $newPrice && $this->makePromotionResponse === "yes") {
-                $this->generatePromotion($product->getName(), $oldPrice, $newPrice);
-                $this->noOfPromotions++;
+            $new_price_is_lower = $newPrice < $oldPrice;
+
+            if ($new_price_is_lower) {
+                $this->promotion($product->getName(), $oldPrice, $newPrice);
+                var_dump("OLD PRICE" . $oldPrice . PHP_EOL);
+                var_dump($product);
+
             }
             return True;
         }
-
         return False;
+    }
+
+    private function promotion($name, $oldPrice, $newPrice)
+    {
+        if ($this->makePromotionResponse === "no") {
+            $this->makePromotionResponse = readline("Do you want to generate promotions[Yes][No]: ");
+
+        } else if ($this->makePromotionResponse === "yes") {
+            $this->generatePromotion($name, $oldPrice, $newPrice);
+            $this->noOfPromotions++;
+        }
     }
 
     private function generatePromotion($name, $oldPrice, $newPrice)
@@ -347,16 +370,20 @@ class Crawler extends Command
     }
 
     /**
-     * @param $product
+     * @param ProductModel $product
      */
-    private function createEntity($product)
+    private function createEntity(ProductModel $product)
     {
-        $category = $this->em->getRepository(Categories::class)->find(rand(1, 6));
-        /** @var ProductEntity $product */
+        if (!empty($product->getCategory())) {
+            $category = $this->em->getRepository(Categories::class)->find($product->getCategory());
+        } else {
+            $category = $this->em->getRepository(Categories::class)->find(rand(1, 6));
+        }
         $newEntProduct = new ProductEntity();
         $newEntProduct->setName($product->getName());
         $newEntProduct->setPrice($product->getPrice());
         $newEntProduct->setStock(rand(2, 100));
+        $newEntProduct->setImage($product->getImage());
         $newEntProduct->setCategory($category);
         $this->em->persist($newEntProduct);
     }

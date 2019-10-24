@@ -1,0 +1,18 @@
+AppBundle\Entity\City:
+  city_{1..50}:
+    id: <current()>
+    name: <name($id - 1)>
+    image: '<image($id - 1)>'
+
+#AppBundle\Entity\Building:
+#  building_{1..5}:
+#    name: <company()>
+#    city: '@city_<current()>'
+#
+#AppBundle\Entity\Room:
+#  room_{1..5}:
+#    building: '@building_<current()>'
+#    number: <numberBetween(100, 500)>
+#    beds: <numberBetween(1, 4)>
+#    available: <boolean(50)>
+#    price: <randomFloat(2, 30, 500)>
